@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简陋观影室</title>
+    <style>
+        body {
+            background-color:antiquewhite; /* 添加灰色背景 */
+        }
+
+        progress {
+            width: 100%;
+            height: 5px;
+            background-color: #ddd;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #007bff;
+        }
+
+        progress::-moz-progress-bar {
+            background-color: #007bff;
+        }
+
+        video {
+            margin-left: 180px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width: 450px">
+        <h1>视频小地方</h1>
+        <p>选择你要看的视频</p>
+    </div>
+    <br>
+
+    <input type="file" id="videoFile">
+    <br>
+    <video id="myVideo" width="80%" height="80%" autoplay loop></video>
+    <br>
+    <progress id="videoProgress" value="0" max="100"></progress>
+    <input type="range" min="0" max="100" value="0" id="customProgress">
+    <br>
+    <button id="playPause">暂停</button>
+    <button id="goBack5">快退</button>
+    <button id="goForward5">快进</button>
+    <button id="volumeUp">放大音量</button>
+    <button id="volumeDown">降低音量</button>
+    <button id="toggleMute">静音</button>
+
+    <script>
+        var myVideo = document.getElementById('myVideo');
+        var playPauseButton = document.getElementById('playPause');
+        var videoProgress = document.getElementById('videoProgress');
+        var videoInput = document.getElementById('videoFile');
+
+        // Play and pause functionality
+        playPauseButton.addEventListener('click', function () {
+            if (myVideo.paused) {
+                myVideo.play();
+                playPauseButton.innerHTML = '暂停';
+            } else {
+                myVideo.pause();
+                playPauseButton.innerHTML = '播放';
+            }
+        });
+
+        // Rewind by 5 seconds
+        document.getElementById('goBack5').addEventListener('click', function () {
+            myVideo.currentTime -= 5;
+        });
+
+        // Forward by 5 seconds
+        document.getElementById('goForward5').addEventListener('click', function () {
+            myVideo.currentTime += 5;
+        });
+
+        // Volume adjustment function
+        function adjustVolume(amount) {
+            myVideo.volume += amount;
+            if (myVideo.volume > 1) myVideo.volume = 1;
+            if (myVideo.volume < 0) myVideo.volume = 0;
+        }
+
+        // Increase volume
+        document.getElementById('volumeUp').addEventListener('click', function () {
+            adjustVolume(0.1);
+        });
+
+        // Decrease volume
+        document.getElementById('volumeDown').addEventListener('click', function () {
+            adjustVolume(-0.1);
+        });
+
+        // Mute and unmute
+        document.getElementById('toggleMute').addEventListener('click', function () {
+            myVideo.muted =!myVideo.muted;
+            this.innerHTML = myVideo.muted? '取消静音' : '静音';
+        });
+
+        // Select video file
+        videoInput.addEventListener('change', function () {
+            const file = videoInput.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                myVideo.src = url;
+                myVideo.play();
+            }
+        });
+
+        // Update progress bar
+        myVideo.addEventListener('timeupdate', function () {
+            var percentage = (myVideo.currentTime / myVideo.duration) * 100;
+            videoProgress.value = percentage;
+            customProgress.value = percentage;
+        });
+
+        customProgress.addEventListener('input', function () {
+            const seekTime = (this.value / 100) * myVideo.duration;
+            myVideo.currentTime = seekTime;
+        });
+    </script>
+</body>
+
+</html>
